@@ -10,7 +10,7 @@ from tqdm import tqdm
 import sys
 from functools import partial
     
-from models.model_classifier import ResNet18
+from models.model_classifier import ResNet50
 from models.utils import EarlyStopping, Tee
 from dataset.dataset_ESC50 import ESC50, get_global_stats, InMemoryESC50
 from augmentAudioClass import AudioAugmenter
@@ -139,7 +139,8 @@ if __name__ == "__main__":
     data_path = config.esc50_path
     use_cuda = torch.cuda.is_available()
     device = torch.device(f"cuda:{config.device_id}" if use_cuda else "cpu")
-
+    
+    print("v2")
     # digits for logging
     float_fmt = ".3f"
     pd.options.display.float_format = ('{:,' + float_fmt + '}').format
@@ -234,7 +235,7 @@ if __name__ == "__main__":
                                         weight_decay=config.weight_decay)
             """
             #todo maybe change the parameters so that they are in config.py
-            optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5, weight_decay=1e-2)
+            optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-2)
 
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                         step_size=config.step_size,

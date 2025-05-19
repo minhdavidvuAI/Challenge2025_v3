@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+"""
 class BasicBlock(nn.Module):
     expansion = 1
 
@@ -210,4 +210,3 @@ class ResNet50(nn.Module):
         x = self.fc(x)           # -> [B, num_classes]
         
         return x
-"""
