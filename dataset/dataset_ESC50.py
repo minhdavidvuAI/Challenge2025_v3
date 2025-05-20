@@ -96,20 +96,15 @@ class ESC50(data.Dataset):
         out_len = int(((config.sr * 5) // config.hop_length) * config.hop_length)
         train = self.subset == "train"
         if train:
-            if augmentedFlag:
-                self.wave_transforms = transforms.Compose(
-                    torch.Tensor,
-                )
-            else:
-                # augment training data with transformations that include randomness
-                # transforms can be applied on wave and spectral representation
-                self.wave_transforms = transforms.Compose(
-                    torch.Tensor,
-                    transforms.RandomScale(max_scale=1.25),
-                    transforms.RandomPadding(out_len=out_len),
-                    transforms.RandomCrop(out_len=out_len),
-                    #transforms.RandomNoise(),
-                )
+            # augment training data with transformations that include randomness
+            # transforms can be applied on wave and spectral representation
+            self.wave_transforms = transforms.Compose(
+                torch.Tensor,
+                transforms.RandomScale(max_scale=1.25),
+                transforms.RandomPadding(out_len=out_len),
+                transforms.RandomCrop(out_len=out_len),
+                #transforms.RandomNoise(),
+            )
 
             self.spec_transforms = transforms.Compose(
                 # to Tensor and prepend singleton dim
@@ -247,15 +242,11 @@ def get_global_stats(data_path, augment_path):
     for i in range(1, 6):
         # Load original training data
         
-        print("test")
         train_set = ESC50(subset="train", test_folds={i}, root=data_path, download=True)
-        
-        print(len(train_set))
         original_data = torch.concatenate([v[1] for v in tqdm(train_set)])
         
         # Load augmented training data
         augmented_dataset = ESC50(subset="train", test_folds={i}, root=augment_path, download=False, augmentedFlag=True)
-        print(augment_path)
         augmented_data = torch.concatenate([v[1] for v in tqdm(augmented_dataset)])
         
         # Combine original and augmented data
