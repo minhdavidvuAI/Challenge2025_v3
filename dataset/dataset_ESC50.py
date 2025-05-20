@@ -255,7 +255,7 @@ def get_global_stats(data_path, augment_path):
         
         # Load augmented training data
         augmented_dataset = ESC50(subset="train", test_folds={i}, root=augment_path, download=False, augmentedFlag=True)
-        print(len(augmented_dataset))
+        print(augment_path)
         augmented_data = torch.concatenate([v[1] for v in tqdm(augmented_dataset)])
         
         # Combine original and augmented data
