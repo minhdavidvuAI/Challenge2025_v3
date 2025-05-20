@@ -17,12 +17,13 @@ from augmentAudioClass import AudioAugmenter
 import config
 
 # mean and std of train data for every fold
-global_stats = np.array([[-54.342407,  21.136114],
-                         [-54.27736,   21.037266],
-                         [-54.197487,  21.005411],
-                         [-54.35301,   20.971909],
-                         [-54.166874,  21.144987]]) 
- 
+global_stats = np.array([[-54.218452,  21.060406],
+                         [-54.163776,  21.08272 ],
+                         [-54.06946,   21.05471 ],
+                         [-54.084515,  20.974787],
+                         [-53.96454,   21.142685]]) 
+
+
 
 # evaluate model on different testing data 'dataloader'
 def test(model, dataloader, criterion, device):
@@ -158,8 +159,8 @@ if __name__ == "__main__":
     # for all folds
     scores = {}
     # expensive!
-    global_stats = get_global_stats(data_path, augment_path)
-    print(global_stats)
+    #global_stats = get_global_stats(data_path, augment_path)
+    #print(global_stats)
     # for spectrograms
     print("WARNING: Using hardcoded global mean and std. Depends on feature settings!")
     for test_fold in config.test_folds:
