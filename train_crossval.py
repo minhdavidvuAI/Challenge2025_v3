@@ -122,7 +122,8 @@ def fit_classifier():
             break
 
         # advance the optimization scheduler
-        scheduler.step()
+        #todo: wenn LRplateu shit remove val loss
+        scheduler.step(val_loss_avg)
     # save full model
     torch.save(model.state_dict(), os.path.join(experiment, 'terminal.pt'))
 
@@ -240,10 +241,11 @@ if __name__ == "__main__":
             """
             #todo maybe change the parameters so that they are in config.py
             optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr, weight_decay=config.weight_decay)
-
+"""
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                         step_size=config.step_size,
-                                                        gamma=config.gamma)
+                                                        gamma=config.gamma)"""
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5, verbose=True)
 
             # fit the model using only training and validation data, no testing data allowed here
             print()
@@ -265,4 +267,5 @@ if __name__ == "__main__":
             print()
     scores = pd.concat(scores).unstack([-1])
     print(pd.concat((scores, scores.agg(['mean', 'std']))))
+    print(f"LR: {config.lr}; WEIGHT: {config.weight_decay}")
     print(global_stats)
