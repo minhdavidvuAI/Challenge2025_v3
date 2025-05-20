@@ -262,3 +262,4 @@ if __name__ == "__main__":
             print()
     scores = pd.concat(scores).unstack([-1])
     print(pd.concat((scores, scores.agg(['mean', 'std']))))
+    print(global_stats)
