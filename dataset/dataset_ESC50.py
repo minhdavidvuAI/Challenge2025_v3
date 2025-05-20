@@ -52,7 +52,7 @@ def download_progress(current, total, width=80):
 
 class ESC50(data.Dataset):
 
-    def __init__(self, root, test_folds=frozenset((1,)), subset="train", global_mean_std=(0.0, 0.0), download=False, augmentedFlag=False):
+    def __init__(self, root, test_folds=frozenset((1,)), subset="train", global_mean_std=(0.0, 1.0), download=False, augmentedFlag=False):
         audio = 'ESC-50-master/audio'
         #TODO
         if augmentedFlag:
@@ -96,15 +96,20 @@ class ESC50(data.Dataset):
         out_len = int(((config.sr * 5) // config.hop_length) * config.hop_length)
         train = self.subset == "train"
         if train:
-            # augment training data with transformations that include randomness
-            # transforms can be applied on wave and spectral representation
-            self.wave_transforms = transforms.Compose(
-                torch.Tensor,
-                transforms.RandomScale(max_scale=1.25),
-                transforms.RandomPadding(out_len=out_len),
-                transforms.RandomCrop(out_len=out_len),
-                #transforms.RandomNoise(),
-            )
+            if augmentedFlag:
+                self.wave_transforms = transforms.Compose(
+                    torch.Tensor,
+                )
+            else:
+                # augment training data with transformations that include randomness
+                # transforms can be applied on wave and spectral representation
+                self.wave_transforms = transforms.Compose(
+                    torch.Tensor,
+                    transforms.RandomScale(max_scale=1.25),
+                    transforms.RandomPadding(out_len=out_len),
+                    transforms.RandomCrop(out_len=out_len),
+                    #transforms.RandomNoise(),
+                )
 
             self.spec_transforms = transforms.Compose(
                 # to Tensor and prepend singleton dim
