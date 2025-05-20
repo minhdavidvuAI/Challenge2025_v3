@@ -10,9 +10,9 @@ from tqdm import tqdm
 import sys
 from functools import partial
     
-from models.model_classifier import ResNet50
+from models.model_classifier import ResNet18
 from models.utils import EarlyStopping, Tee
-from dataset.dataset_ESC50 import ESC50, get_global_stats, InMemoryESC50
+from dataset.dataset_ESC50 import ESC50, get_global_stats
 from augmentAudioClass import AudioAugmenter
 import config
 
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     use_cuda = torch.cuda.is_available()
     device = torch.device(f"cuda:{config.device_id}" if use_cuda else "cpu")
     
-    print("v2")
+    print("v3")
     # digits for logging
     float_fmt = ".3f"
     pd.options.display.float_format = ('{:,' + float_fmt + '}').format
@@ -149,8 +149,8 @@ if __name__ == "__main__":
     print(f"Root: {experiment_root}")
     os.makedirs(experiment_root, exist_ok=True)
     
+    # get train data and augment 
     augment_path = config.augment_path
-    
     ESC50(subset="train", root=config.esc50_path, download=True)
     audio_augmenter = AudioAugmenter(os.path.join(config.esc50_path, 'ESC-50-master/audio'), config.augment_path)
     audio_augmenter.augment_data()
@@ -158,6 +158,8 @@ if __name__ == "__main__":
     # for all folds
     scores = {}
     # expensive!
+    global_stats = get_global_stats(data_path, augment_path)
+    print(global_stats)
     # for spectrograms
     print("WARNING: Using hardcoded global mean and std. Depends on feature settings!")
     for test_fold in config.test_folds:
@@ -194,8 +196,7 @@ if __name__ == "__main__":
                 print(f"lenght both: {len(combined_dataset)}")
                 raise ValueError
             
-            #global_stats = get_global_stats(data_path, augment_path)
-            #print(global_stats)
+
             
             
             print('*****')
@@ -235,7 +236,7 @@ if __name__ == "__main__":
                                         weight_decay=config.weight_decay)
             """
             #todo maybe change the parameters so that they are in config.py
-            optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-2)
+            optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr, weight_decay=config.weight_decay)
 
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                         step_size=config.step_size,

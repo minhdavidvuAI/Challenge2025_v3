@@ -21,8 +21,8 @@ n_mels = 128
 hop_length = 512
 #n_mfcc = 42
 
-#model_constructor = "ResNet50(num_classes=config.n_classes)"
-model_constructor = "ResNet18(num_classes=config.n_classes)"
+model_constructor = "ResNet50(num_classes=config.n_classes)"
+#model_constructor = "ResNet18(num_classes=config.n_classes)"
 # ###TRAINING
 # ratio to split off from training data
 val_size = .2  # could be changed
