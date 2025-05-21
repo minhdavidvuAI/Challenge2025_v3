@@ -226,7 +226,7 @@ class InMemoryESC50(ESC50):
     def __getitem__(self, idx):
         return self.data[idx]
         
-"""
+
 def get_global_stats(data_path):
     res = []
     for i in range(1, 6):
@@ -256,3 +256,4 @@ def get_global_stats(data_path, augment_path):
         res.append((combined_data.mean(), combined_data.std()))
     
     return np.array(res)
+"""

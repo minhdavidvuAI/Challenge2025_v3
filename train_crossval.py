@@ -138,6 +138,10 @@ def make_model():
 
 
 if __name__ == "__main__":
+    import time
+    # Start timer
+    start_time = time.time()
+    
     data_path = config.esc50_path
     use_cuda = torch.cuda.is_available()
     device = torch.device(f"cuda:{config.device_id}" if use_cuda else "cpu")
@@ -160,7 +164,8 @@ if __name__ == "__main__":
     # for all folds
     scores = {}
     # expensive!
-    global_stats = get_global_stats(data_path, augment_path)
+    #global_stats = get_global_stats(data_path, augment_path)
+    global_stats = get_global_stats(data_path)
     print(global_stats)
     # for spectrograms
     
@@ -175,22 +180,22 @@ if __name__ == "__main__":
         with Tee(os.path.join(experiment, 'train.log'), 'w', 1, encoding='utf-8',
                  newline='\n', proc_cr=True):
             # this function assures consistent 'test_folds' setting for train, val, test splits
-            get_fold_dataset = partial(InMemoryESC50, root=data_path, download=False,
+            get_fold_dataset = partial(ESC50, root=data_path, download=False,
                                        test_folds={test_fold}, global_mean_std=global_stats[test_fold - 1])
 
             
+            train_set = get_fold_dataset(subset="train")
+            """
             get_fold_augmented = partial(
-                InMemoryESC50,
+                ESC50,
                 root=augment_path,
                 download=False,
                 test_folds={test_fold},
                 global_mean_std=global_stats[test_fold - 1],
                 augmentedFlag=True,
             )
-            
-            train_set = get_fold_dataset(subset="train")
-            augmented_set = get_fold_augmented(subset="train")
-            combined_dataset = ConcatDataset([train_set, augmented_set])
+            #augmented_set = get_fold_augmented(subset="train")
+            #combined_dataset = ConcatDataset([train_set, augmented_set])
             
             # sanity check
             # train set should be the same length as augmented
@@ -200,6 +205,7 @@ if __name__ == "__main__":
                 print(f"lenght both: {len(combined_dataset)}")
                 raise ValueError
             
+            """
 
             
             
@@ -207,7 +213,7 @@ if __name__ == "__main__":
             print(f'train folds are {train_set.train_folds} and test fold is {train_set.test_folds}')
             print('random wave cropping')
 
-            train_loader = torch.utils.data.DataLoader(combined_dataset,
+            train_loader = torch.utils.data.DataLoader(train_set,
                                                        batch_size=config.batch_size,
                                                        shuffle=True,
                                                        num_workers=config.num_workers,
@@ -241,11 +247,11 @@ if __name__ == "__main__":
             """
             #todo maybe change the parameters so that they are in config.py
             optimizer = torch.optim.AdamW(model.parameters(), lr=config.lr, weight_decay=config.weight_decay)
-"""
+            
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                         step_size=config.step_size,
-                                                        gamma=config.gamma)"""
-            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5, verbose=True)
+                                                        gamma=config.gamma)
+            #scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5, verbose=True)
 
             # fit the model using only training and validation data, no testing data allowed here
             print()
@@ -269,3 +275,8 @@ if __name__ == "__main__":
     print(pd.concat((scores, scores.agg(['mean', 'std']))))
     print(f"LR: {config.lr}; WEIGHT: {config.weight_decay}")
     print(global_stats)
+    end = time.time()
+    length = (end - start) / 60
+
+    # Show the results : this can be altered however you like
+    print(f"Runtime {length} min!")
