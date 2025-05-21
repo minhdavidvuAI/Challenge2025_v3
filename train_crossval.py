@@ -123,7 +123,7 @@ def fit_classifier():
 
         # advance the optimization scheduler
         #todo: wenn LRplateu shit remove val loss
-        scheduler.step(val_loss_avg)
+        scheduler.step()
     # save full model
     torch.save(model.state_dict(), os.path.join(experiment, 'terminal.pt'))
 
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     use_cuda = torch.cuda.is_available()
     device = torch.device(f"cuda:{config.device_id}" if use_cuda else "cpu")
     
-    print("InMemoryVersion")
+    print("No Augment")
     # digits for logging
     float_fmt = ".3f"
     pd.options.display.float_format = ('{:,' + float_fmt + '}').format
